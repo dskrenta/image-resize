@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="myCanvas" width="470" height="246"></canvas>
+    <img src="http://www2.pictures.zimbio.com/gi/Tribeca+Film+Festival+2011+Portrait+Studio+YggxbyXLAjWl.jpg"/>
+    <script>
+      var canvas = document.getElementById('myCanvas');
+      var context = canvas.getContext('2d');
+      var imageObj = new Image();
+      var imageObj2 = new Image();
+      var imageObj3 = new Image();
+
+      var finalImageWidth = (canvas.width / 3);
+      var finalImageHeight = canvas.height;
+
+      var destAspectRatio = finalImageWidth / finalImageHeight;
+
+      /*
+      imageObj.onload = function() {
+        context.drawImage(imageObj, 2, 0, imageObj.width, imageObj.height, 0, 0, finalImageWidth + 2, finalImageHeight);
+        context.drawImage(imageObj, 0, 0, imageObj.width, imageObj.height, finalImageWidth, 0, finalImageWidth, finalImageHeight);
+        context.drawImage(imageObj, 0, 0, imageObj.width, imageObj.height, (finalImageWidth * 2), 0, finalImageWidth, finalImageHeight);
+      };
+      imageObj.src = 'http://www2.pictures.zimbio.com/gi/Tribeca+Film+Festival+2011+Portrait+Studio+YggxbyXLAjWl.jpg';
+      */
+
+      imageObj.onload = function () {
+        context.drawImage(imageObj, 2, 0, imageObj.width, imageObj.height, 0, 0, finalImageWidth + 2, finalImageHeight);
+      };
+
+      imageObj2.onload = function() {
+        context.drawImage(imageObj2, 0, 0, imageObj2.width, imageObj2.height, finalImageWidth, 0, finalImageWidth, finalImageHeight);
+      };
+
+      imageObj3.onload = function() {
+        context.drawImage(imageObj3, 0, 0, imageObj3.width, imageObj3.height, (finalImageWidth * 2), 0, finalImageWidth, finalImageHeight);
+      };
+
+      imageObj.src = 'http://www2.pictures.zimbio.com/gi/Tribeca+Film+Festival+2011+Portrait+Studio+YggxbyXLAjWl.jpg';
+      imageObj2.src = 'http://proxy.topixcdn.com/ipicimg/3V8HA329TTBEL9N4-rszh170';
+      imageObj3.src = 'darth-vader.jpg';
+    </script>
+  </body>
+</html>

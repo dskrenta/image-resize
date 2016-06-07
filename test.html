@@ -1,0 +1,293 @@
+<html>
+  <head>
+    <style>
+      html,body,canvas {
+        margin: 0;
+        display: block;
+        font-size: .9em;
+      }
+      svg,canvas {
+        display: inline-block;
+      }
+      canvas {
+        border: 1px solid green;
+      }
+      svg {
+        border: 1px solid blue;
+      }
+    </style>
+  </head>
+  <body>
+    x
+    <select name="x">
+      <option value="Mid">Mid</option>
+      <option value="Min">Min</option>
+      <option value="Max">Max</option>
+    </select>
+    Y
+    <select name="Y">
+      <option value="Mid">Mid</option>
+      <option value="Min">Min</option>
+      <option value="Max">Max</option>
+    </select>
+
+    <select name="slice_meet">
+      <option value="slice">slice</option>
+      <option value="meet">meet</option>
+    </select>
+    image format :
+    <select name="format">
+      <option value="0">portrait</option>
+      <option value="1">landscape</option>
+      <option value="2">square</option>
+    </select>
+    <br>
+
+    <canvas id="outputLandscape" width="280" height="200"></canvas>
+    <svg width="280" height="200" viewBox="0 0 280 200">
+      <image id="svgImageLandscape" x="0" y="0" width="100%" height="100%"></image>
+    </svg>
+    <br>
+    <!--
+    <canvas id="outputPortrait" width="200" height="280"></canvas>
+    <svg width="200" height="280" viewBox="0 0 200 280">
+      <image id="svgImagePortrait" x="0" y="0" width="100%" height="100%"></image>
+    </svg>
+  -->
+  <canvas id="outputPortrait" width="150" height="250"></canvas>
+  <svg id ="imagePortrait" width="150" height="250" viewBox="0 0 150 250">
+    <image id="svgImagePortrait" x="0" y="0" width="100%" height="100%"></image>
+  </svg>
+    <br>
+    <canvas id="outputSquare" width="200" height="200"></canvas>
+    <svg width="200" height="200" viewBox="0 0 200 200">
+      <image id="svgImageSquare" x="0" y="0" width="100%" height="100%"></image>
+    </svg>
+
+    <hr />
+    <canvas id="finalImage" width="470" height="246"></canvas>
+
+    <script>
+      // Get blob from svg data
+      var svg = document.getElementById('imagePortrait');
+      var svgData = new XMLSerializer().serializeToString(svg);
+      var blob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+
+      // Get the blob's URL
+      var blobUrl = (self.URL || self.webkitURL || self).createObjectURL(blob);
+      var img = new Image;
+      img.src = blobUrl;
+
+      img.onload = function() {
+        var canvas = document.getElementById('finalImage');
+        var context = canvas.getContext('2d');
+        context.drawImage(img, 0, 0, 150, 200);
+      }
+
+    </script>
+
+    <script>
+    var preserveAspectRatio = function(source, destination, userString) {
+
+  var srcWidth = source.width,
+    srcHeight = source.height,
+    destinationW = destination.width,
+    destinationH = destination.height;
+
+  // we should keep the whole source
+  var aRMeet = function(args) {
+
+    var srcRatio = (srcHeight / srcWidth),
+      destRatio = (destinationH / destinationW),
+
+      resultWidth = destRatio > srcRatio ? destinationW : destinationH / srcRatio,
+      resultHeight = destRatio > srcRatio ? destinationW * srcRatio : destinationH;
+
+    var getPos = function(arg, res, dest) {
+
+      var max = Math.max(res, dest),
+        min = Math.min(res, dest);
+
+      switch (arg) {
+        case 'Min': return 0;
+        case 'Mid': return (max - min) / 2;
+        case 'Max': return max - min;
+        default:    return 'invalid';
+      }
+    };
+
+    var obj = {
+      img: returnedImg,
+      sx: 0,
+      sy: 0,
+      swidth: srcWidth,
+      sheight: srcHeight,
+      dx: getPos(args[0], resultWidth, destinationW),
+      dy: getPos(args[1], resultHeight, destinationH),
+      dwidth: resultWidth,
+      dheight: resultHeight
+    };
+
+    if (obj[5] === 'invalid' || obj[6] === 'invalid') {
+      return default_obj;
+    }
+
+    return obj;
+  };
+
+  // we should slice the larger part
+  var aRSlice = function(args) {
+
+    var resultWidth, resultHeight;
+
+    var a = function() {
+      resultWidth = destinationW;
+      resultHeight = srcHeight * destinationW / srcWidth;
+    };
+
+    var b = function() {
+      resultWidth = srcWidth * destinationH / srcHeight;
+      resultHeight = destinationH;
+    };
+
+    if (destinationW > destinationH) {
+      a();
+      if (destinationH > resultHeight) {
+        b();
+      }
+    } else if (destinationW === destinationH) {
+      if (srcWidth > srcHeight) {
+        b();
+      } else {
+        a();
+      }
+    } else {
+      b();
+      if (destinationW > resultWidth) {
+        a();
+      }
+    }
+
+    var getPos = function(arg, res, dest, src) {
+      switch (arg) {
+        case 'Min': return 0;
+        case 'Mid': return (res - dest) / 2 * src / res;
+        case 'Max': return (res - dest) * src / res;
+        default: return 'invalid';
+      }
+    };
+
+    var x = getPos(args[0], resultWidth, destinationW, srcWidth);
+    var y = getPos(args[1], resultHeight, destinationH, srcHeight);
+
+    var obj = {
+      img: returnedImg,
+      sx: x,
+      sy: y,
+      swidth: srcWidth - x,
+      sheight: srcHeight - y,
+      dx: 0,
+      dy: 0,
+      dwidth: resultWidth - (x * (resultWidth / srcWidth)),
+      dheight: resultHeight - (y * (resultHeight / srcHeight)),
+    };
+
+    if (obj[1] === 'invalid' || obj[2] === 'invalid') {
+      return default_obj;
+    }
+
+    return obj;
+  };
+
+  // check if the object passed was drawable over a canvas
+  var returnedImg = source.nodeName === 'IMG' || source.nodeName === 'VIDEO' || source.nodeName === 'CANVAS' ? source : null;
+
+  // if an invalid string or none is set as the preserveAspectRatio, this should be considered as "xMidYMid meet"
+  var default_obj = aRMeet(['Mid', 'Mid']);
+
+  if (!userString) {
+    return default_obj;
+  } else {
+
+    var args = userString.trim().split(' '),
+      minMidMax = args[0].replace('x', '').split('Y');
+
+    switch (args[args.length - 1]) {
+      case "meet":  return aRMeet(minMidMax);
+      case "slice": return aRSlice(minMidMax);
+      default:      return default_obj;
+    }
+  }
+};
+
+ //
+ //  Snippet code
+ //_______________
+
+var images = [new Image(), new Image(), new Image()];
+var img = images[0];
+var selects = document.querySelectorAll('select');
+
+var ctxL = outputLandscape.getContext('2d');
+var ctxP = outputPortrait.getContext('2d');
+var ctxS = outputSquare.getContext('2d');
+
+var update = function() {
+  ctxL.clearRect(0, 0, outputLandscape.width, outputLandscape.height);
+  ctxP.clearRect(0, 0, outputPortrait.width, outputPortrait.height);
+  ctxS.clearRect(0, 0, outputSquare.width, outputSquare.height);
+
+  var aspectRatioStr = 'x' + selects[0].value + 'Y' + selects[1].value + ' ' + selects[2].value;
+
+  var p = preserveAspectRatio(img, outputPortrait, aspectRatioStr);
+  ctxP.drawImage(p.img, p.sx, p.sy, p.swidth, p.sheight, p.dx, p.dy, p.dwidth, p.dheight);
+
+  var l = preserveAspectRatio(img, outputLandscape, aspectRatioStr);
+  ctxL.drawImage(l.img, l.sx, l.sy, l.swidth, l.sheight, l.dx, l.dy, l.dwidth, l.dheight);
+
+  var s = preserveAspectRatio(img, outputSquare, aspectRatioStr);
+  ctxS.drawImage(s.img, s.sx, s.sy, s.swidth, s.sheight, s.dx, s.dy, s.dwidth, s.dheight);
+
+  svgImagePortrait.setAttribute('preserveAspectRatio', aspectRatioStr);
+  svgImageLandscape.setAttribute('preserveAspectRatio', aspectRatioStr);
+  svgImageSquare.setAttribute('preserveAspectRatio', aspectRatioStr);
+};
+
+for (var i = 0; i < selects.length - 1; i++) {
+  selects[i].onchange = update;
+}
+selects[3].onchange = function() {
+  img = images[+this.value];
+  update();
+  svgImagePortrait.setAttributeNS('http://www.w3.org/1999/xlink', 'href', img.src);
+  svgImageLandscape.setAttributeNS('http://www.w3.org/1999/xlink', 'href', img.src);
+  svgImageSquare.setAttributeNS('http://www.w3.org/1999/xlink', 'href', img.src);
+
+}
+
+img.onload = function() {
+  svgImagePortrait.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.src);
+  svgImageLandscape.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.src);
+  svgImageSquare.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.src);
+
+  update();
+};
+
+
+//images[0].src = "http://lorempixel.com/100/200";
+//images[1].src = "http://lorempixel.com/200/100";
+//images[2].src = "http://lorempixel.com/200/200";
+
+/*
+images[0].src='http://proxy.topixcdn.com/ipicimg/O8HT9G2VIE04A8GH-rszh170';
+images[1].src='http://proxy.topixcdn.com/ipicimg/O8HT9G2VIE04A8GH-rszh170';
+images[2].src='http://proxy.topixcdn.com/ipicimg/O8HT9G2VIE04A8GH-rszh170';
+*/
+
+images[0].src = 'darth-vader.jpg';
+images[1].src = 'darth-vader.jpg';
+images[2].src = 'darth-vader.jpg';
+
+    </script>
+  </body>
+</html>
