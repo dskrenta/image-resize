@@ -1,52 +1,57 @@
-<!DOCTYPE HTML>
 <html>
   <head>
-    <style>
-      body {
-        margin: 0px;
-        padding: 0px;
-      }
-    </style>
   </head>
   <body>
-    <canvas id="myCanvas" width="470" height="246"></canvas>
-    <img src="http://www2.pictures.zimbio.com/gi/Tribeca+Film+Festival+2011+Portrait+Studio+YggxbyXLAjWl.jpg"/>
+    <canvas id="canvas" hidden></canvas>
+    <canvas id="canvas1" hidden></canvas>
+    <canvas id="canvas2" hidden></canvas>
+
+    <canvas id="finalCanvas" width="810" height="415"></canvas>
+
+    <script src="resize.js"></script>
     <script>
-      var canvas = document.getElementById('myCanvas');
-      var context = canvas.getContext('2d');
-      var imageObj = new Image();
-      var imageObj2 = new Image();
-      var imageObj3 = new Image();
+      var finalCanvas = document.getElementById('finalCanvas');
+      var finalCtx = finalCanvas.getContext('2d');
+      var finalCanvasWidth = 810;
+      var finalCanvasHeight = 415;
+      var thirdOfWidth = (finalCanvasWidth / 3);
 
-      var finalImageWidth = (canvas.width / 3);
-      var finalImageHeight = canvas.height;
+      var canvas = document.getElementById('canvas');
+      var canvas1 = document.getElementById('canvas1');
+      var canvas2 = document.getElementById('canvas2');
 
-      var destAspectRatio = finalImageWidth / finalImageHeight;
+      canvas.width = thirdOfWidth;
+      canvas.height = finalCanvasHeight;
+      canvas1.width = thirdOfWidth;
+      canvas1.height = finalCanvasHeight;
+      canvas2.width = thirdOfWidth;
+      canvas2.height = finalCanvasHeight;
 
-      /*
-      imageObj.onload = function() {
-        context.drawImage(imageObj, 2, 0, imageObj.width, imageObj.height, 0, 0, finalImageWidth + 2, finalImageHeight);
-        context.drawImage(imageObj, 0, 0, imageObj.width, imageObj.height, finalImageWidth, 0, finalImageWidth, finalImageHeight);
-        context.drawImage(imageObj, 0, 0, imageObj.width, imageObj.height, (finalImageWidth * 2), 0, finalImageWidth, finalImageHeight);
-      };
-      imageObj.src = 'http://www2.pictures.zimbio.com/gi/Tribeca+Film+Festival+2011+Portrait+Studio+YggxbyXLAjWl.jpg';
-      */
+      var ctx = canvas.getContext('2d');
+      var img = new Image;
+      var ctx1 = canvas1.getContext('2d');
+      var img1 = new Image;
+      var ctx2 = canvas2.getContext('2d');
+      var img2 = new Image;
 
-      imageObj.onload = function () {
-        context.drawImage(imageObj, 2, 0, imageObj.width, imageObj.height, 0, 0, finalImageWidth + 2, finalImageHeight);
-      };
+      img.onload = function() {
+        drawImageProp(ctx, img, 0, 0, canvas.width, canvas.height, 0.5, 0.0);
+        drawFinal(0);
+      }
+      img.src = 'http://img14.deviantart.net/aa8f/i/2015/119/0/8/darth_vader_portrait_by_archistrator2814-d3ki6a1.jpg';
 
-      imageObj2.onload = function() {
-        context.drawImage(imageObj2, 0, 0, imageObj2.width, imageObj2.height, finalImageWidth, 0, finalImageWidth, finalImageHeight);
-      };
+      img1.onload = function() {
+        drawImageProp(ctx1, img1, 0, 0, canvas1.width, canvas1.height, 0.5, 0.0);
+        drawFinal(1);
+      }
+      img1.src = 'https://s-media-cache-ak0.pinimg.com/736x/17/30/15/173015e6fbf6ad12893979106862fffc.jpg';
 
-      imageObj3.onload = function() {
-        context.drawImage(imageObj3, 0, 0, imageObj3.width, imageObj3.height, (finalImageWidth * 2), 0, finalImageWidth, finalImageHeight);
-      };
+      img2.onload = function() {
+        drawImageProp(ctx2, img2, 0, 0, canvas2.width, canvas2.height, 0.5, 0.0);
+        drawFinal(2);
+      }
+      img2.src = 'http://images4.fanpop.com/image/photos/17700000/Han-Solo-han-solo-17713311-334-512.jpg';
 
-      imageObj.src = 'http://www2.pictures.zimbio.com/gi/Tribeca+Film+Festival+2011+Portrait+Studio+YggxbyXLAjWl.jpg';
-      imageObj2.src = 'http://proxy.topixcdn.com/ipicimg/3V8HA329TTBEL9N4-rszh170';
-      imageObj3.src = 'darth-vader.jpg';
     </script>
   </body>
 </html>
