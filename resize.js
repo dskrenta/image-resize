@@ -4,98 +4,63 @@ function tripic(images, finalWidth, finalHeight) {
   var cells = images.length;
   var sectionOfWidth = (finalCanvasWidth / cells);
 
+  // switch for default x and y offsets
+  var offsetX, offsetY;
+  switch (images.length) {
+    case 2: // 2 images
+      offsetX = 0.5;
+      offsetY = 0.5;
+      console.log("2");
+      break;
+    case 3: // 3 images
+      offsetX = 0.5;
+      offsetY = 0.0;
+      console.log("3");
+      break;
+    case 4: // 4 images
+      offsetX = 0.5;
+      offsetY = 0.0;
+      console.log("4");
+      break;
+  }
+
   // create final canvas
   var finalCanvas = document.createElement("canvas");
-  //finalCanvas.setAttribute("type", "hidden");
   finalCanvas.setAttribute("id", "finalCanvas");
   finalCanvas.setAttribute("width", finalCanvasWidth);
-  finalCanvas.setAttribute("height", finalCanvasWidth);
-  var finalCtx = finalCanvas.getContext('2d');
+  finalCanvas.setAttribute("height", finalCanvasHeight);
+  document.body.appendChild(finalCanvas);
 
   // create image and sub canvas for each image
   for (var i = 0; i < images.length; i++) {
     var canvas = document.createElement("canvas"); // create sub canvas
-    //canvas.setAttribute("type", "hidden"); // hide subcanvas element
-    canvas.setAttribute("width", sectionOfWidth); // set subcanvas width to section of final canvas
-    canvas.setAttribute("height", finalCanvasHeight); // set subcanvas height to final canvas height
+    canvas.setAttribute("width", sectionOfWidth);
+    canvas.setAttribute("height", finalCanvasHeight); 
     var canvasID = "canvas" + i;
     canvas.setAttribute("id", canvasID);
+    canvas.style.display = "none";
     document.body.appendChild(canvas);
-    var ctx = canvas.getContext('2d'); // get sub canvas context
     var img = new Image(); // create new image
     var imageID = "image" + i;
     img.style.display = "none";
     img.id = imageID;
     document.body.appendChild(img);
-    generateOnload(imageID, canvasID);
-    /*
-    img.onload = function() {
-      drawImageProp(ctx, img, 0, 0, canvas.width, canvas.height, 0.5, 0.0);
-      //drawFinal(0);
-      var xPos = 0;
-      if (i != 0) xPos = (sectionOfWidth * i);
-      finalCtx.drawImage(canvas, xPos, 0, canvas.width, canvas.height);
-    }
-    */
+    generateOnload(imageID, canvasID, "finalCanvas", sectionOfWidth, i, offsetX, offsetY);
     img.src = images[i];
   }
 }
 
-function generateOnload(targetImageID, targetCanvasID) {
+function generateOnload(targetImageID, targetCanvasID, finalCanvasID, sectionOfWidth, index, offsetX, offsetY) {
   var img = document.getElementById(targetImageID);
   var canvas = document.getElementById(targetCanvasID);
   var ctx = canvas.getContext('2d');
-  img.onload = function() {
-    drawImageProp(ctx, img, 0, 0, canvas.width, canvas.height, 0.5, 0.0);
-    console.log(targetImageID + " Loaded");
-  }
-}
-
-function createPic(imgs) {
-  /*
-  var finalCanvas = document.createElement('canvas');
-  finalCanvas.setAttribute('height', 810);
-  finalCanvas.setAttribute('width', 415);
+  var finalCanvas = document.getElementById(finalCanvasID);
   var finalCtx = finalCanvas.getContext('2d');
-  */
-
-  var finalCanvasWidth = 810; // default 810 px width
-  var finalCanvasHeight = 415; // default 415 px height
-  var cells = imgs.length;
-  var sectionOfWidth = (finalCanvasWidth / cells);
-
-  for (var i = 0; i < imgs.length; i++) {
-    var canvas = document.createElement("canvas"); // create sub canvas
-    canvas.setAttribute("width", sectionOfWidth); // set subcanvas width to section of final canvas
-    canvas.setAttribute("height", finalCanvasHeight); // set subcanvas height to final canvas height
-    var canvasID = "canvas" + i;
-    canvas.setAttribute("id", canvasID);
-    document.body.appendChild(canvas);
-    var ctx = canvas.getContext('2d'); // get sub canvas context
-
-    var img = new Image();
-    img.onload = function() {
-      console.log(img.src);
-      console.log(ctx);
-      drawImageProp(ctx, img, 0, 0, sectionOfWidth, finalCanvasHeight, 0.5, 0.0);
-    }
-    img.src =  imgs[i];
-  }
-}
-
-function draw(ctx, img, canvas) {
-  drawImageProp(ctx, img, 0, 0, canvas.width, canvas.height, 0.5, 0.0);
-}
-
-function drawFinal(position) {
-  if(position == 0) {
-    finalCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height);
-  }
-  else if (position == 1) {
-    finalCtx.drawImage(canvas1, thirdOfWidth, 0, canvas1.width, canvas1.height);
-  }
-  else if (position == 2) {
-    finalCtx.drawImage(canvas2, (thirdOfWidth * 2), 0, canvas2.width, canvas2.height);
+  img.onload = function() {
+    drawImageProp(ctx, img, 0, 0, canvas.width, canvas.height, offsetX, offsetY);
+    var xPos = 0;
+    if (index != 0) xPos = (sectionOfWidth * index);
+    finalCtx.drawImage(canvas, xPos, 0, canvas.width, canvas.height);
   }
 }
 
